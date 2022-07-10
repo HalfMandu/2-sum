@@ -15,34 +15,33 @@ const fs = require('fs');
 class TwoSum{
 
 	constructor(){
-		this.hash = [];
+		this.numbers = [];
 	}
 	
-	//Step through each key in the table and check if it's matching target pair also exists in the table
 	calc2Sum(){
 		
-		const targets = new Set();   //the target values which form the sum
+		const targetsFound = new Set();   //the targeted sums identified
+		const MIN = -2;
+		const MAX = 2;
 		
-		//10000, 5, 2
-		const MIN = -10000;
-		const MAX = 10000;
-		
-		for (let num of this.hash){
-
-			let low = bisectLeft(this.hash, MIN - num);
-			let high = bisectRight(this.hash, MAX - num);
+		//step through each number and check if it's matching target value also exists in the array
+		for (const num of this.numbers){
 			
-			//step through the window range, and add the sums (as long as not duplicates)
+			//establishing the window of valid sums
+			const low = bisectLeft(this.numbers, MIN - num);
+			const high = bisectRight(this.numbers, MAX - num);
+			
+			//cover the range and identify target sums (as long as not handling duplicates)
 			for (let i = low; i < high; i++){
-				if (this.hash[i] != num){
-					targets.add(num + this.hash[i]);
+				if (this.numbers[i] != num){
+					targetsFound.add(num + this.numbers[i]);
 				}
-			} 
+			}
 		
 		}
 		
-		console.log("Final target values size: " + targets.size);
-		return targets.size;
+		console.log("Final target values size: " + targetsFound.size);
+		return targetsFound.size;
 	}
 	
 	//Alternative loader for testing smaller, custom static arrays rather than input files
@@ -50,14 +49,14 @@ class TwoSum{
 		
 		const nums = [5,-2,3,-5,1,6,-1,-4,2,-3,4,-6];
 		
-		for (let num of nums){
-			this.hash.push(num);   
+		for (const num of nums){
+			this.numbers.push(num);   
 		}
 	}
 	
 }
 
-//Take input file and load numbers into hash table
+//Take input file and load numbers into array
 const parseFile = async (file) => {
 
 	const nums = (await util.promisify(fs.readFile)(file)).toString().split('\n');
@@ -66,11 +65,11 @@ const parseFile = async (file) => {
 	//each line is a single number
 	nums.map(num => {
 		if (!num) { return null; }
-		twoSum.hash.push(Number(num)); 
+		twoSum.numbers.push(Number(num)); 
 	});
 	
 	//sort the data to make tracking targets easier
-	twoSum.hash.sort((a, b) => a - b);
+	twoSum.numbers.sort((a, b) => a - b);
 	
 	return twoSum;
 }; 
@@ -83,7 +82,6 @@ console.log("Starting up 2-Sum...");
 
 const startTime = performance.now();
 
-//2sum, 2sumNegs
 parseFile('./2sum.txt').then((twoSum) => {
 	
 	twoSum.calc2Sum();
@@ -91,7 +89,7 @@ parseFile('./2sum.txt').then((twoSum) => {
 	const endTime = performance.now();
 	const dur = Math.round((endTime - startTime) * 100) / 100;
 	
-	console.log(`2sum took ${dur/1000} seconds`);   // ~  1.65 seconds
+	console.log(`2sum took ${dur/1000} seconds`);   // ~ 1.65 seconds
 	
 });
 
